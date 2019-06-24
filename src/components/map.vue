@@ -1,9 +1,7 @@
 <template>
   <div>
-    <div id="map">
-    </div>
+    <div id="map"></div>
   </div>
-
 </template>
 
 <script>
@@ -26,6 +24,7 @@ import Text from "ol/style/Text";
 import Icon from "ol/style/Icon";
 import { pointerMove, click } from "ol/events/condition";
 import Select from "ol/interaction/Select";
+import shuiku from "./水库.png";
 
 export default {
   data() {
@@ -37,29 +36,29 @@ export default {
           name: "水库",
           type: "VECTORTILE",
           geoType: "point",
-          layerName: "cjliuyushuiku",
+          layerName: "bengzhan",
           visible: true,
           layerUrl:
-            "/geoserver166/gwc/service/tms/1.0.0/test:cjliuyushuiku@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+            "/geoserver166/gwc/service/tms/1.0.0/new:bengzhan@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+          field: "CODE",
           vectorConfig: {
-            zoom: 0,
-            labelField: "测站名",
-            minZoomStyle: (text, zoom) => {
+            zoom: 10,
+            minZoomStyle: name => {
               return new Style({
                 image: new Icon({
                   src: shuiku,
-                  scale: 0.3
+                  scale: 0.1
                 })
               });
             },
-            maxZoomStyle: text => {
+            maxZoomStyle: name => {
               return new Style({
                 image: new Icon({
                   src: shuiku,
                   scale: 0.5
                 }),
                 text: new Text({
-                  text: text,
+                  text: name,
                   offsetY: -20,
                   offsetX: 20,
                   font: "5px sans-serif",
@@ -112,7 +111,7 @@ export default {
       this.map = new Map({
         view: new View({
           center: [11815338.577971682, 3558032.468689678], // [103.91678460032786, 26.735038084423355], // 金沙江流域
-          zoom: 5,
+          zoom: 6,
           minZoom: 1,
           maxZoom: 18,
           projection: "EPSG:3857"
@@ -136,26 +135,16 @@ export default {
             url: v.layerUrl
           }),
           preload: 6,
-          // style: f => {
-          //   // console.log("f: ", f);
-          //   let props = f.getProperties(),
-          //     zoom = this.map.getView().getZoom();
-          //   if (zoom >= v.vectorConfig.zoom) {
-          //     return v.vectorConfig.maxZoomStyle(
-          //       zoom,
-          //       f,
-          //       this.selection,
-          //       props
-          //     );
-          //   } else {
-          //     return v.vectorConfig.minZoomStyle(
-          //       zoom,
-          //       f,
-          //       this.selection,
-          //       props
-          //     );
-          //   }
-          // },
+          style: f => {
+            // console.log("f: ", f);
+            let name = f.getProperties()[v.field],
+              zoom = this.map.getView().getZoom();
+            if (zoom >= v.vectorConfig.zoom) {
+              return v.vectorConfig.maxZoomStyle(name);
+            } else {
+              return v.vectorConfig.minZoomStyle(name);
+            }
+          },
           zIndex: 6000
         });
         layer.setVisible(v.visible);

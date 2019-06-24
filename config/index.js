@@ -11,9 +11,8 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-
       '/geoserver166': {
-        target: 'http://10.6.172.166:8010',
+        target: 'http://106.14.203.229:8010',
         pathRewrite: {
           '^/geoserver166': '/geoserver'
         },
